@@ -17,7 +17,6 @@ namespace RestaurantOpdracht_BL.Managers {
         }
 
         public Klant RegistreerKlant(string naam, Contactgegevens contactgegevens) {
-            //TODO: klant toevoegen aan DB en ID toevoegen alvorens return
             if (repo.HeeftKlant(naam, contactgegevens)) throw new ManagerException("Klant bestaat al");
             return repo.RegistreerKlant(new Klant(naam, contactgegevens));
         }

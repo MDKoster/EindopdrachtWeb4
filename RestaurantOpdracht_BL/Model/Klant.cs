@@ -1,6 +1,7 @@
 ﻿using RestaurantOpdracht_BL.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,8 +17,11 @@ namespace RestaurantOpdracht_BL.Model {
             SetID(iD);
         }
 
+        public Klant() {
+        }
+
         public int ID { get; private set; }
-        public string Naam { get; private set; }
+        public string Naam { get; set; }
         public Contactgegevens Contactgegevens { get; set; }
 
         public void SetID(int iD) {

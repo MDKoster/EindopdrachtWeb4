@@ -9,10 +9,9 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace RestaurantOpdracht_EF.Repositories {
     public class ReservatieRepository : IReservatieRepository {
 
-        private RestaurantContext ctx;
+        private RestaurantContext ctx = new RestaurantContext();
 
-        public ReservatieRepository(RestaurantContext ctx) {
-            this.ctx = ctx;
+        public ReservatieRepository() {
         }
 
         private void SaveAndClear() {
@@ -107,10 +106,12 @@ namespace RestaurantOpdracht_EF.Repositories {
             }
         }
 
-        public void MaakReservatie(Reservatie reservatie) {
+        public Reservatie MaakReservatie(Reservatie reservatie) {
             try {
-                ctx.Reservatie.Add(MapFromDomain.MapReservatieToReservatieEF(reservatie));
+                ReservatieEF res = MapFromDomain.MapReservatieToReservatieEF(reservatie, ctx);
+                ctx.Reservatie.Add(res);
                 SaveAndClear();
+                return MapToDomain.MapReservatieEFToReservatie(res);
             } catch (Exception ex) {
                 throw new RepositoryException("MaakReservatie", ex);
             }

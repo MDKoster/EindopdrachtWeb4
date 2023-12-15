@@ -13,7 +13,7 @@ namespace RestaurantOpdracht_BL.Interfaces {
         List<Reservatie> GeefReservatiesInRestaurant(int id, DateTime datum);
         bool HeeftReservatie(int reservatieID);
         bool IsTafelGereserveerd(Restaurant restaurant, DateTime datum, int tafelNr);
-        void MaakReservatie(Reservatie reservatie);
+        Reservatie MaakReservatie(Reservatie reservatie);
         bool ReservatieInToekomst(int reservatieID);
         Reservatie UpdateReservatie(Reservatie reservatie);
     }

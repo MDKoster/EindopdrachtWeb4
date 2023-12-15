@@ -17,14 +17,14 @@ namespace RestaurantOpdracht_BL.Managers {
             this.restaurantRepo = restaurantRepo;
         }
 
-        public void MaakReservatie(Klant klant, Restaurant restaurant, int aantalPlaatsen, DateTime datum, int tafelNr) {
+        public Reservatie MaakReservatie(Klant klant, Restaurant restaurant, int aantalPlaatsen, DateTime datum, int tafelNr) {
             if (repo.IsTafelGereserveerd(restaurant, datum, tafelNr)) throw new ManagerException("Tafel is al gereserveerd");
             if (datum.Minute != 0 && datum.Minute != 30) throw new ManagerException("Reserveren kan enkel op xx:00 of xx:30");
             if (restaurant.ID == 0) throw new ManagerException("Restaurant staat nog niet in DB");
             if (klant.ID == 0) throw new ManagerException("Klant staat nog niet in DB");
             //Reservatie object aanmaken omdat alle checks daar uitgevoerd worden
             Reservatie reservatie = new(klant, restaurant, aantalPlaatsen, datum, tafelNr);
-            repo.MaakReservatie(reservatie);
+            return repo.MaakReservatie(reservatie);
         }
 
         public Reservatie UpdateReservatie(Reservatie reservatie) {

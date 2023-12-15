@@ -8,10 +8,9 @@ using RestaurantOpdracht_EF.Model;
 namespace RestaurantOpdracht_EF.Repositories {
     public class RestaurantRepository : IRestaurantRepository {
 
-        private RestaurantContext ctx;
+        private RestaurantContext ctx = new RestaurantContext();
 
-        public RestaurantRepository(RestaurantContext ctx) {
-            this.ctx = ctx;
+        public RestaurantRepository() {
         }
 
         private void SaveAndClear() {
@@ -68,6 +67,7 @@ namespace RestaurantOpdracht_EF.Repositories {
                     restaurants = ctx.Restaurant.AsNoTracking()
                     .Include(r => r.Tafels)
                     .Include(r => r.Reservaties)
+                    .Where(r => r.Status == true)
                     .Where(r => r.Tafels.Any(t => t.AantalPlaatsen >= aantalPlaatsen &&
                     !r.Reservaties.Any(res => res.TafelNr == t.TafelNr && res.Datum == datum)))
                     .Select<RestaurantEF, Restaurant>(r => MapToDomain.MapRestaurantEFToRestaurant(r))
@@ -76,6 +76,7 @@ namespace RestaurantOpdracht_EF.Repositories {
                     restaurants = ctx.Restaurant.AsNoTracking()
                     .Include(r => r.Tafels)
                     .Include(r => r.Reservaties)
+                    .Where(r => r.Status == true)
                     .Where(r => r.Keuken.Contains(keuken))
                     .Where(r => r.Tafels.Any(t => t.AantalPlaatsen >= aantalPlaatsen &&
                     !r.Reservaties.Any(res => res.TafelNr == t.TafelNr && res.Datum == datum)))
@@ -85,6 +86,7 @@ namespace RestaurantOpdracht_EF.Repositories {
                     restaurants = ctx.Restaurant.AsNoTracking()
                     .Include(r => r.Tafels)
                     .Include(r => r.Reservaties)
+                    .Where(r => r.Status == true)
                     .Where(r => r.Postcode.Equals(postcode))
                     .Where(r => r.Tafels.Any(t => t.AantalPlaatsen >= aantalPlaatsen &&
                     !r.Reservaties.Any(res => res.TafelNr == t.TafelNr && res.Datum == datum)))
@@ -94,6 +96,7 @@ namespace RestaurantOpdracht_EF.Repositories {
                     restaurants = ctx.Restaurant.AsNoTracking()
                     .Include(r => r.Tafels)
                     .Include(r => r.Reservaties)
+                    .Where(r => r.Status == true)
                     .Where(r => r.Keuken.Contains(keuken))
                     .Where(r => r.Postcode.Equals(postcode))
                     .Where(r => r.Tafels.Any(t => t.AantalPlaatsen >= aantalPlaatsen &&
@@ -129,7 +132,7 @@ namespace RestaurantOpdracht_EF.Repositories {
 
         public Restaurant UpdateRestaurant(Restaurant restaurant) {
             try {
-                ctx.Restaurant.Update(MapFromDomain.MapRestaurantToRestaurantEF(restaurant));
+                ctx.Restaurant.Update(MapFromDomain.MapRestaurantToRestaurantEF(restaurant, ctx));
                 SaveAndClear();
                 return MapToDomain.MapRestaurantEFToRestaurant(ctx.Restaurant.Find(restaurant.ID));
             } catch (Exception ex) {
@@ -150,7 +153,7 @@ namespace RestaurantOpdracht_EF.Repositories {
 
         public Restaurant VoegRestaurantToe(Restaurant restaurant) {
             try {
-                RestaurantEF restaurantEF = MapFromDomain.MapRestaurantToRestaurantEF(restaurant);
+                RestaurantEF restaurantEF = MapFromDomain.MapRestaurantToRestaurantEF(restaurant, ctx);
                 ctx.Restaurant.Add(restaurantEF);
                 SaveAndClear();
                 return MapToDomain.MapRestaurantEFToRestaurant(restaurantEF);

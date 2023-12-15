@@ -18,9 +18,9 @@ namespace RestaurantOpdracht_BL.Model {
         }
 
         public int Tel { get; set; }
-        public string Email { get; private set; }
-        public int Postcode { get; private set; }
-        public string Gemeentenaam { get; private set; }
+        public string Email { get; set; }
+        public int Postcode { get; set; }
+        public string Gemeentenaam { get; set; }
         public string? Straatnaam { get; set; }
         public string? HuisNr { get; set; }
 

@@ -10,9 +10,9 @@ using System.Runtime.ConstrainedExecution;
 namespace RestaurantOpdracht_Console_App {
     internal class Program {
         static void Main(string[] args) {
-            IRestaurantRepository restoRepo = new RestaurantRepository(new RestaurantContext());
-            IKlantRepository klantRepo = new KlantRepository(new RestaurantContext());
-            IReservatieRepository resRepo = new ReservatieRepository(new RestaurantContext());
+            IRestaurantRepository restoRepo = new RestaurantRepository();
+            IKlantRepository klantRepo = new KlantRepository();
+            IReservatieRepository resRepo = new ReservatieRepository();
             RestaurantManager restaurantManager = new(restoRepo);
             KlantManager klantManager = new(klantRepo);
             ReservatieManager reservatieManager = new(resRepo, restoRepo);
@@ -120,7 +120,6 @@ namespace RestaurantOpdracht_Console_App {
 
                                 data.Add(randomDate);
                             }
-                            //TODO: problemen met wegschrijven reservaties oplossen
                             for (int i = 0; i < 10; i++) {
                                 Restaurant resto = restaurantManager.GeefRestaurant(i+1);
                                 Klant klant = klantManager.GeefKlant(i + 1);

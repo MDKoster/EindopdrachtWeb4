@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using REST_API.Model.Output;
+using REST_API.Mappers;
 using RestaurantOpdracht_BL.Exceptions;
 using RestaurantOpdracht_BL.Managers;
 using RestaurantOpdracht_BL.Model;
-using System.Resources;
+using REST_API.Model.Input;
 
 namespace REST_API.Controllers {
     [Route("api/[controller]")]
@@ -20,10 +21,10 @@ namespace REST_API.Controllers {
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Restaurant> Get(int id) {
+        public ActionResult<RestaurantOutputDTO> Get(int id) {
             try {
                 logger.LogTrace($"Restaurant ID: {id} - GET called");
-                return Ok(restaurantManager.GeefRestaurant(id));
+                return Ok(MapFromDomain.MapRestaurantToRestaurantOutput(restaurantManager.GeefRestaurant(id)));
             } catch (ManagerException ex) {
                 logger.LogError($"RestaurantID: {id} - GET error - NotFound", ex);
                 return NotFound();
@@ -34,10 +35,10 @@ namespace REST_API.Controllers {
         }
 
         [HttpGet("{id}/{datum}")]
-        public ActionResult<List<Reservatie>> Get(int id, DateTime datum) {
+        public ActionResult<List<ReservatieOutputDTO>> Get(int id, DateTime datum) {
             try {
                 logger.LogTrace($"Reservaties in restaurant ID: {id} op datum {datum} - GET called");
-                return Ok(reservatieManager.GeefReservatiesInRestaurant(id, datum));
+                return Ok(reservatieManager.GeefReservatiesInRestaurant(id, datum).Select(r => MapFromDomain.MapReservatieToReservatieOutput(r)));
             } catch (ManagerException ex) {
                 logger.LogError($"Reservaties in restaurant ID: {id} op datum {datum} - GET error - NotFound", ex);
                 return NotFound();
@@ -48,10 +49,10 @@ namespace REST_API.Controllers {
         }
 
         [HttpGet("{id}/{start}/{eind}")]
-        public ActionResult<List<Reservatie>> Get(int id, DateTime start, DateTime eind) {
+        public ActionResult<List<ReservatieOutputDTO>> Get(int id, DateTime start, DateTime eind) {
             try {
                 logger.LogTrace($"Reservaties in restaurant ID: {id} in periode {start} - {eind} - GET called");
-                return Ok(reservatieManager.GeefReservatiesInRestaurant(id, start, eind));
+                return Ok(reservatieManager.GeefReservatiesInRestaurant(id, start, eind).Select(r => MapFromDomain.MapReservatieToReservatieOutput(r)));
             } catch (ManagerException ex) {
                 logger.LogError($"Reservaties in restaurant ID: {id} in periode {start} - {eind} - GET error - NotFound", ex);
                 return NotFound();
@@ -63,11 +64,12 @@ namespace REST_API.Controllers {
 
         //TODO: betere error return toevoegen mbt internal server error? afhankelijk van waar de error wordt gethrowd?
         [HttpPost]
-        public ActionResult<Restaurant> MaakRestaurant([FromBody] Restaurant restaurant) {
+        public ActionResult<RestaurantOutputDTO> MaakRestaurant([FromBody] RestaurantInputDTO restaurant) {
             try {
                 logger.LogTrace($"Maak restaurant aan - {restaurant.Naam} - POST called");
-                restaurantManager.VoegRestaurantToe(restaurant.Naam, restaurant.Keuken, restaurant.Contactgegevens, restaurant.Tafels);
-                return CreatedAtAction(nameof(Get), new { id = restaurant.ID }, restaurant);
+                Contactgegevens contactgegevens = new(restaurant.Tel, restaurant.Email, restaurant.Postcode, restaurant.Gemeentenaam, restaurant.Straatnaam, restaurant.HuisNr);
+                RestaurantOutputDTO resto = MapFromDomain.MapRestaurantToRestaurantOutput(restaurantManager.VoegRestaurantToe(restaurant.Naam, restaurant.Keuken, contactgegevens, restaurant.Tafels.Select(t => MapToDomain.MapTafelInputToTafel(t)).ToList()));
+                return CreatedAtAction(nameof(Get), new { id = resto.ID }, resto);
             } catch (Exception ex) {
                 logger.LogError($"Maak restaurant aan - BadRequest", ex);
                 return BadRequest();
@@ -75,16 +77,16 @@ namespace REST_API.Controllers {
         }
 
         [HttpPut]
-        public ActionResult<Restaurant> UpdateRestaurant([FromBody] Restaurant restaurant) {
+        public ActionResult<RestaurantOutputDTO> UpdateRestaurant(int id, [FromBody] RestaurantInputDTO restaurant) {
             try {
-                logger.LogTrace($"Update restaurant ID: {restaurant.ID} - PUT called");
-                Restaurant updatedRestaurant = restaurantManager.UpdateRestaurant(restaurant);
+                logger.LogTrace($"Update restaurant ID: {id} - PUT called");
+                RestaurantOutputDTO updatedRestaurant = MapFromDomain.MapRestaurantToRestaurantOutput(restaurantManager.UpdateRestaurant(MapToDomain.MapRestaurantInputToRestaurant(restaurant)));
                 return Ok(updatedRestaurant);
             } catch (ManagerException ex) {
-                logger.LogError($"Update restaurant ID: {restaurant.ID} - NotFound", ex);
+                logger.LogError($"Update restaurant ID: {id} - NotFound", ex);
                 return NotFound();
             } catch (Exception ex) {
-                logger.LogError($"Update restaurant ID: {restaurant.ID} - BadRequest", ex);
+                logger.LogError($"Update restaurant ID: {id} - BadRequest", ex);
                 return BadRequest();
             }
         }

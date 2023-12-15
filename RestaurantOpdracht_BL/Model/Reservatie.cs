@@ -20,10 +20,13 @@ namespace RestaurantOpdracht_BL.Model {
             SetID(iD);
         }
 
-        public int ID { get; set; }
-        public Klant Klant { get; private set; }
-        public Restaurant Restaurant { get; private set; }
-        public int AantalPlaatsen { get; private set; }
+        public Reservatie() {
+        }
+
+        public int ID { get; private set; }
+        public Klant Klant { get; set; }
+        public Restaurant Restaurant { get; set; }
+        public int AantalPlaatsen { get; set; }
         public DateTime Datum { get; set; }
         public int TafelNr { get; set; }
 

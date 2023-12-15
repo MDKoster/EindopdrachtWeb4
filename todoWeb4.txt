@@ -1,0 +1,19 @@
+-Mappers en Model toevoegen aan RestAPI
+
+-DB aanpassen zodat gebruiker geen cascade delete is maar ook niet bijgehouden wordt, dus reservaties blijven bestaan maar gebruiker wordt wel verwijderd.
+
+-Gebruiker=> Reservatie: swagger queries testen: 
+	Reservatie Post
+	Reservatie Update
+	Reservatie Remove
+	Reservatie Get Start - Eind
+
+-Beheerder => alle swagger queries testen
+
+-Logging => verder uitbouwen
+
+-Errorhandling verder uitbouwen
+
+-Tafel is bij reservatie 1u30 gereserveerd (attribuut in Tafel klasse toevoegen?)
+
+-Beste tafel toewijzen op basis van aantal plaatsen

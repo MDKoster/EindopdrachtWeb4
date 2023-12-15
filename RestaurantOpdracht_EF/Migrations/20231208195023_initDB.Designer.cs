@@ -52,9 +52,6 @@ namespace RestaurantOpdracht_EF.Migrations
                         .HasMaxLength(4)
                         .HasColumnType("int");
 
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Straatnaam")
                         .HasColumnType("nvarchar(100)");
 

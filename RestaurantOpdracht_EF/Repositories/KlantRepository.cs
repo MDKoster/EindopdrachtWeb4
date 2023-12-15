@@ -7,10 +7,9 @@ using RestaurantOpdracht_EF.Model;
 namespace RestaurantOpdracht_EF.Repositories {
     public class KlantRepository : IKlantRepository {
 
-        private RestaurantContext ctx;
+        private RestaurantContext ctx = new RestaurantContext();
 
-        public KlantRepository(RestaurantContext ctx) {
-            this.ctx = ctx;
+        public KlantRepository() {
         }
 
         private void SaveAndClear() {
@@ -40,7 +39,7 @@ namespace RestaurantOpdracht_EF.Repositories {
 
         public Klant RegistreerKlant(Klant klant) {
             try {
-                KlantEF klantEF = MapFromDomain.MapKlantToKlantEF(klant);
+                KlantEF klantEF = MapFromDomain.MapKlantToKlantEF(klant, ctx);
                 ctx.Klant.Add(klantEF);
                 SaveAndClear();
                 return MapToDomain.MapKlantEFToKlant(klantEF);
@@ -51,7 +50,7 @@ namespace RestaurantOpdracht_EF.Repositories {
 
         public Klant UpdateKlant(Klant klant) {
             try {
-                KlantEF klantEF = MapFromDomain.MapKlantToKlantEF(klant);
+                KlantEF klantEF = MapFromDomain.MapKlantToKlantEF(klant, ctx);
                 ctx.Klant.Update(klantEF);
                 SaveAndClear();
                 return MapToDomain.MapKlantEFToKlant(klantEF);
@@ -63,8 +62,7 @@ namespace RestaurantOpdracht_EF.Repositories {
         public void VerwijderKlant(int id) {
             try {
                 KlantEF klantEF = ctx.Klant.Find(id);
-                klantEF.Status = false;
-                ctx.Klant.Update(klantEF);
+                ctx.Klant.Remove(klantEF);
                 SaveAndClear();
             } catch (Exception ex) {
                 throw new RepositoryException("VerwijderKlant", ex);

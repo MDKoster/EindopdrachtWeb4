@@ -24,7 +24,6 @@ namespace RestaurantOpdracht_EF.Migrations
                     Gemeentenaam = table.Column<string>(type: "nvarchar(100)", nullable: false),
                     Straatnaam = table.Column<string>(type: "nvarchar(100)", nullable: true),
                     HuisNr = table.Column<string>(type: "nvarchar(25)", nullable: true),
-                    Status = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using REST_API.Mappers;
+using REST_API.Model.Input;
+using REST_API.Model.Output;
 using RestaurantOpdracht_BL.Exceptions;
 using RestaurantOpdracht_BL.Interfaces;
 using RestaurantOpdracht_BL.Managers;
@@ -25,10 +28,10 @@ namespace REST_API.Controllers {
 
         [HttpGet]
         [Route("Klant/{id}")]
-        public ActionResult<Klant> Get(int id) {
+        public ActionResult<KlantOutputDTO> Get(int id) {
             try {
                 logger.LogTrace($"Klant ID: {id} - GET called");
-                return Ok(klantManager.GeefKlant(id));
+                return Ok(MapFromDomain.MapKlantToKlantOutput(klantManager.GeefKlant(id)));
             } catch (ManagerException ex) {
                 logger.LogError($"Klant ID: {id} - GET error - NotFound", ex);
                 return NotFound();
@@ -40,11 +43,12 @@ namespace REST_API.Controllers {
 
         [HttpPost]
         [Route("Klant")]
-        public ActionResult<Klant> RegistreerKlant([FromBody] Klant klant) {
+        public ActionResult<KlantOutputDTO> RegistreerKlant([FromBody] KlantInputDTO klant) {
             try {
                 logger.LogTrace($"Maak klant aan - {klant.Naam} - POST called");
-                klantManager.RegistreerKlant(klant.Naam, klant.Contactgegevens);
-                return CreatedAtAction(nameof(Get), new { id = klant.ID }, klant);
+                Contactgegevens contactgegevens = new(klant.Tel, klant.Email, klant.Postcode, klant.Gemeentenaam, klant.Straatnaam, klant.HuisNr);
+                KlantOutputDTO newKlant = MapFromDomain.MapKlantToKlantOutput(klantManager.RegistreerKlant(klant.Naam, contactgegevens));
+                return CreatedAtAction(nameof(Get), new { id = newKlant.ID }, newKlant);
             } catch (Exception ex) {
                 logger.LogError($"Maak klant aan - BadRequest", ex);
                 return BadRequest();
@@ -52,17 +56,17 @@ namespace REST_API.Controllers {
         }
 
         [HttpPut]
-        [Route("Klant")]
-        public ActionResult<Klant> UpdateKlant([FromBody] Klant klant) {
+        [Route("Klant/{id}")]
+        public ActionResult<KlantOutputDTO> UpdateKlant(int id, [FromBody] KlantInputDTO klant) {
             try {
-                logger.LogTrace($"Update klant ID: {klant.ID} - PUT called");
-                Klant updatedKlant = klantManager.UpdateKlant(klant);
+                logger.LogTrace($"Update klant ID: {id} - PUT called");
+                KlantOutputDTO updatedKlant = MapFromDomain.MapKlantToKlantOutput(klantManager.UpdateKlant(MapToDomain.MapKlantInputToKlant(klant)));
                 return Ok(updatedKlant);
             } catch (ManagerException ex) {
-                logger.LogError($"Update klant ID: {klant.ID} - NotFound", ex);
+                logger.LogError($"Update klant ID: {id} - NotFound", ex);
                 return NotFound();
             } catch (Exception ex) {
-                logger.LogError($"Update klant ID: {klant.ID} - BadRequest", ex);
+                logger.LogError($"Update klant ID: {id} - BadRequest", ex);
                 return BadRequest();
             }
         }
@@ -83,13 +87,12 @@ namespace REST_API.Controllers {
             }
         }
 
-        //TODO: queries gebruiken voor optionele parameters
         [HttpGet]
-        [Route("Restaurant/{postcode?}/{keuken?}")]
-        public ActionResult<List<Restaurant>> GeefRestaurants(int? postcode, string? keuken) {
+        [Route("Restaurant")]
+        public ActionResult<List<RestaurantOutputDTO>> GeefRestaurants([FromQuery]int? postcode, [FromQuery]string? keuken) {
             try {
                 logger.LogTrace($"Geef restaurants op basis van postcode en/of keuken: {postcode}/{keuken} - GET called");
-                return Ok(restaurantManager.GeefRestaurants(postcode, keuken));
+                return Ok(restaurantManager.GeefRestaurants(postcode, keuken).Select(r => MapFromDomain.MapRestaurantToRestaurantOutput(r)).ToList());
             } catch (Exception ex) {
                 logger.LogError($"Geef restaurants op basis van postcode en/of keuken: {postcode}/{keuken} - GET error - BadRequest", ex);
                 return BadRequest();
@@ -97,11 +100,11 @@ namespace REST_API.Controllers {
         }
 
         [HttpGet]
-        [Route("Restaurant/{aantalPlaatsen}/{datum}/{postcode?}/{keuken?}")]
-        public ActionResult<List<Restaurant>> GeefRestaurants(int aantalPlaatsen, DateTime datum, int? postcode, string? keuken) {
+        [Route("Restaurant/{aantalPlaatsen}/{datum}")]
+        public ActionResult<List<RestaurantOutputDTO>> GeefRestaurants(int aantalPlaatsen, DateTime datum, [FromQuery]int? postcode, [FromQuery] string? keuken) {
             try {
                 logger.LogTrace($"Geef restaurants met vrije tafels voor {aantalPlaatsen}, op {datum}, optioneel {postcode}/{keuken} - GET called");
-                return Ok(restaurantManager.GeefRestaurantsMetVrijeTafels(aantalPlaatsen , datum, postcode, keuken)); 
+                return Ok(restaurantManager.GeefRestaurantsMetVrijeTafels(aantalPlaatsen , datum, postcode, keuken).Select(r => MapFromDomain.MapRestaurantToRestaurantOutput(r)).ToList()); 
             } catch (Exception ex) {
                 logger.LogError($"Geef restaurants met vrije tafels voor {aantalPlaatsen}, op {datum}, optioneel {postcode}/{keuken} - GET error - BadRequest", ex);
                 return BadRequest();
@@ -110,17 +113,18 @@ namespace REST_API.Controllers {
 
         [HttpPost]
         [Route("Reservatie")]
-        public ActionResult<Reservatie> MaakReservatie([FromBody] Reservatie reservatie) {
+        public ActionResult<ReservatieOutputDTO> MaakReservatie([FromBody] ReservatieInputDTO reservatie) {
             try {
                 logger.LogTrace($"Maak reservatie - POST called");
-                reservatieManager.MaakReservatie(reservatie.Klant, reservatie.Restaurant, reservatie.AantalPlaatsen, reservatie.Datum, reservatie.TafelNr);
-                return CreatedAtAction(nameof(Get), new { id = reservatie.ID }, reservatie);
+                ReservatieOutputDTO res = MapFromDomain.MapReservatieToReservatieOutput(reservatieManager.MaakReservatie(MapToDomain.MapKlantInputToKlant(reservatie.Klant), MapToDomain.MapRestaurantInputToRestaurant(reservatie.Restaurant), reservatie.AantalPlaatsen, reservatie.Datum, reservatie.TafelNr));
+                return CreatedAtAction(nameof(Get), new { id = res.ID }, res);
             } catch (Exception ex) {
                 logger.LogError($"Maak reservatie - POST error - BadRequest", ex);
                 return BadRequest();
             }
         }
 
+        //TODO: verder aanpassen
         [HttpPut]
         [Route("Reservatie/Update/{id}")]
         public ActionResult<Reservatie> UpdateReservatie(int id, [FromBody] Reservatie reservatie) {

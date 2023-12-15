@@ -11,7 +11,7 @@ namespace RestaurantOpdracht_EF.Model {
         public KlantEF() {
         }
 
-        public KlantEF(string naam, int tel, string email, int postcode, string gemeentenaam, string? straatnaam, string? huisNr, bool status) {
+        public KlantEF(string naam, int tel, string email, int postcode, string gemeentenaam, string? straatnaam, string? huisNr) {
             Naam = naam;
             Tel = tel;
             Email = email;
@@ -19,10 +19,9 @@ namespace RestaurantOpdracht_EF.Model {
             Gemeentenaam = gemeentenaam;
             Straatnaam = straatnaam;
             HuisNr = huisNr;
-            Status = status;
         }
 
-        public KlantEF(int iD, string naam, int tel, string email, int postcode, string gemeentenaam, string? straatnaam, string? huisNr, bool status) : this(naam, tel, email, postcode, gemeentenaam, straatnaam, huisNr, status) {
+        public KlantEF(int iD, string naam, int tel, string email, int postcode, string gemeentenaam, string? straatnaam, string? huisNr) : this(naam, tel, email, postcode, gemeentenaam, straatnaam, huisNr) {
             ID = iD;
         }
 
@@ -44,7 +43,6 @@ namespace RestaurantOpdracht_EF.Model {
         public string? Straatnaam { get; set; }
         [Column(TypeName = "nvarchar(25)")]
         public string? HuisNr { get; set; }
-        public bool Status { get; set; }
         public List<ReservatieEF> Reservaties { get; set; }
     }
 }
