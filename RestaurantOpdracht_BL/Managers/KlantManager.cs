@@ -4,6 +4,7 @@ using RestaurantOpdracht_BL.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,14 +22,20 @@ namespace RestaurantOpdracht_BL.Managers {
             return repo.RegistreerKlant(new Klant(naam, contactgegevens));
         }
 
-        public void UpdateKlant(Klant klant) {
-            if (!repo.HeeftKlant(klant)) throw new ManagerException("Klant bestaat niet");
-            repo.UpdateKlant(klant);
+        public Klant UpdateKlant(Klant klant) {
+            if (!repo.HeeftKlant(klant.ID)) throw new ManagerException("Klant bestaat niet");
+            return repo.UpdateKlant(klant);
         }
 
-        public void DeleteKlant(Klant klant) {
-            if (!repo.HeeftKlant(klant)) throw new ManagerException("Klant bestaat niet");
-            repo.VerwijderKlant(klant);
+        public void DeleteKlant(int id) {
+            if (!repo.HeeftKlant(id)) throw new ManagerException("Klant bestaat niet");
+            repo.VerwijderKlant(id);
+        }
+
+        public Klant GeefKlant(int id) {
+            if (!repo.HeeftKlant(id)) throw new ManagerException("Klant bestaat niet");
+            if (id <= 0) throw new ManagerException("ID moet groter zijn dan 0");
+            return repo.GeefKlant(id);
         }
     }
 }

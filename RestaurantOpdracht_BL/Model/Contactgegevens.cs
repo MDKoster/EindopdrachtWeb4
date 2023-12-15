@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RestaurantOpdracht_BL.Model {
     public class Contactgegevens {
-        public Contactgegevens(int tel, string email, int postcode, string gemeentenaam, string? straatnaam, int? huisNr) {
+        public Contactgegevens(int tel, string email, int postcode, string gemeentenaam, string? straatnaam, string? huisNr) {
             Tel = tel;
             SetEmail(email);
             SetPostcode(postcode);
@@ -22,7 +22,7 @@ namespace RestaurantOpdracht_BL.Model {
         public int Postcode { get; private set; }
         public string Gemeentenaam { get; private set; }
         public string? Straatnaam { get; set; }
-        public int? HuisNr { get; set; }
+        public string? HuisNr { get; set; }
 
         public void SetEmail(string email) {
             if (!email.Contains('@')) throw new ModelException("Email is ongeldig formaat");

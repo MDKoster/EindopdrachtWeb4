@@ -15,32 +15,35 @@ namespace RestaurantOpdracht_BL.Managers {
             this.repo = repo;
         }
         
-        public Restaurant VoegRestaurantToe(string naam, string keuken, Contactgegevens contactgegevens, Dictionary<int, Tafel> tafels) {
-            //TODO: resto toevoegen aan DB en ID toevoegen alvorens return
+        public Restaurant VoegRestaurantToe(string naam, string keuken, Contactgegevens contactgegevens, List<Tafel> tafels) {
             if (repo.HeeftRestaurant(naam, contactgegevens)) throw new ManagerException("Restaurant bestaat al");
             return repo.VoegRestaurantToe(new Restaurant(naam, keuken, contactgegevens, tafels));
         }
 
-        public void UpdateRestaurant(Restaurant restaurant) {
-            if (!repo.HeeftRestaurant(restaurant)) throw new ManagerException("Restaurant bestaat niet");
-            repo.UpdateRestaurant(restaurant);
+        public Restaurant UpdateRestaurant(Restaurant restaurant) {
+            if (!repo.HeeftRestaurant(restaurant.ID)) throw new ManagerException("Restaurant bestaat niet");
+            return repo.UpdateRestaurant(restaurant);
         }
 
-        public void VerwijderRestaurant(Restaurant restaurant) {
-            if (!repo.HeeftRestaurant(restaurant)) throw new ManagerException("Restaurant bestaat niet");
-            repo.VerwijderRestaurant(restaurant);
+        public void VerwijderRestaurant(int id) {
+            if (!repo.HeeftRestaurant(id)) throw new ManagerException("Restaurant bestaat niet");
+            repo.VerwijderRestaurant(id);
         }
 
-        //o resto opzoeken
-        //	    op locatie en/of keuken
         public List<Restaurant> GeefRestaurants(int? postcode, string? keuken) {
             if (postcode == null && keuken == null) throw new ManagerException("Zoekparameters zijn allebei leeg");
             return repo.GeefRestaurants(postcode, keuken);
         }
 
-        //o overzicht opvragen van resto's met vrije tafel voor n plaatsen op bepaalde datum
-        public List<Restaurant> GeefRestaurantsMetVrijeTafels(int aantalPlaatsen, DateTime datum) {
-            return repo.GeefRestaurantsMetVrijeTafels(aantalPlaatsen, datum);
+        public List<Restaurant> GeefRestaurantsMetVrijeTafels(int aantalPlaatsen, DateTime datum, int? postcode, string? keuken) {
+            if (aantalPlaatsen <= 0) throw new ManagerException("Aantalplaatsen moet groter zijn dan 0");
+            return repo.GeefRestaurantsMetVrijeTafels(aantalPlaatsen, datum, postcode, keuken);
+        }
+
+        public Restaurant GeefRestaurant(int id) {
+            if (!repo.HeeftRestaurant(id)) throw new ManagerException("Restaurant niet gevonden");
+            if (id <= 0) throw new ManagerException("ID moet positief zijn");
+            return repo.GeefRestaurant(id);
         }
     }
 }

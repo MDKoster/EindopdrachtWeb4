@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace RestaurantOpdracht_BL.Model {
     public class Restaurant {
-        public Restaurant(string naam, string keuken, Contactgegevens contactgegevens, Dictionary<int, Tafel> tafels) {
+        public Restaurant(string naam, string keuken, Contactgegevens contactgegevens, List<Tafel> tafels) {
             SetNaam(naam);
             Keuken = keuken;
             Contactgegevens = contactgegevens;
             Tafels = tafels;
         }
 
-        public Restaurant(int iD, string naam, string keuken, Contactgegevens contactgegevens, Dictionary<int, Tafel> tafels) : this(naam, keuken, contactgegevens, tafels) {
+        public Restaurant(int iD, string naam, string keuken, Contactgegevens contactgegevens, List<Tafel> tafels) : this(naam, keuken, contactgegevens, tafels) {
             SetID(iD);
         }
 
@@ -22,7 +22,7 @@ namespace RestaurantOpdracht_BL.Model {
         public string Naam { get; private set; }
         public string Keuken { get; set; }
         public Contactgegevens Contactgegevens { get; set; }
-        public Dictionary<int, Tafel> Tafels { get; private set; }
+        public List<Tafel> Tafels { get; private set; }
 
         public void SetID(int iD) {
             if (iD <= 0) throw new ModelException("ID is 0 of negatief");
@@ -36,7 +36,7 @@ namespace RestaurantOpdracht_BL.Model {
 
         public void VoegTafelToe(Tafel tafel) {
             if (tafel == null) throw new ModelException("Tafel is null");
-            Tafels.Add(tafel.TafelNr,tafel);
+            Tafels.Add(tafel);
         }
     }
 }

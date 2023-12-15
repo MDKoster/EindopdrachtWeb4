@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 
 namespace RestaurantOpdracht_BL.Interfaces {
     public interface IRestaurantRepository {
+        Restaurant GeefRestaurant(int id);
         List<Restaurant> GeefRestaurants(int? postcode, string? keuken);
-        List<Restaurant> GeefRestaurantsMetVrijeTafels(int aantalPlaatsen, DateTime datum);
+        List<Restaurant> GeefRestaurantsMetVrijeTafels(int aantalPlaatsen, DateTime datum, int? postcode, string? keuken);
         bool HeeftRestaurant(string naam, Contactgegevens contactgegevens);
-        bool HeeftRestaurant(Restaurant restaurant);
-        void UpdateRestaurant(Restaurant restaurant);
-        void VerwijderRestaurant(Restaurant restaurant);
+        bool HeeftRestaurant(int restaurantID);
+        Restaurant UpdateRestaurant(Restaurant restaurant);
+        void VerwijderRestaurant(int id);
         Restaurant VoegRestaurantToe(Restaurant restaurant);
     }
 }

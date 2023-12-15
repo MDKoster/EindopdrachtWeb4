@@ -13,6 +13,7 @@ namespace RestaurantOpdracht_BL.Model {
             SetAantalPlaatsen(aantalPlaatsen);
             SetDatum(datum);
             SetTafelNr(tafelNr);
+
         }
 
         public Reservatie(int iD, Klant klant, Restaurant restaurant, int aantalPlaatsen, DateTime datum, int tafelNr) : this(klant, restaurant, aantalPlaatsen, datum, tafelNr) {
